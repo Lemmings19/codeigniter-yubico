@@ -91,8 +91,7 @@
                             <li class="list-inline-item">
                                 <button class="btn btn-primary">
                                     (testing) Submit
-                                    <span class="fas fa-arrow-right"></span>
-                                </span>
+                                </button>
                             </li>
                     </div>
                 </div>

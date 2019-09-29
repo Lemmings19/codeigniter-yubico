@@ -2,7 +2,14 @@
     <div class="row justify-content-center">
         <div class="col-sm-6 col-md-4">
             <h1>Login</h1>
-            <form class="form-horizontal" role="form" method="POST" action="/register">
+
+            <?php $this->load->helper('form'); ?>
+
+            <div class="text-danger">
+                <?php echo validation_errors(); ?>
+            </div>
+
+            <?php echo form_open('users/login'); ?>
 
                 <div id="basicInfo">
                     <div class="form-group">
@@ -32,10 +39,13 @@
                     -->
 
                     <div class="form-group">
-                        <span id="login" class="disabled btn btn-primary">
+                        <span id="login" class="btn btn-primary">
                             Login
                             <span class="fas fa-sign-in-alt"></span>
                         </span>
+                        <button class="btn btn-primary">
+                                    (testing) Submit
+                                </button>
                     </div>
                 </div>
 
@@ -79,12 +89,6 @@
 
 <script>
     $(document).ready(function () {
-        $("#basicInfo").change(function () {
-            if ($("[name=email]").val() && $("[name=password]").val()) {
-                $("#login").removeClass("disabled");
-            }
-        });
-
         $("#login").click(function () {
             if (true) {
                 $('#physKeyModal').modal('show');

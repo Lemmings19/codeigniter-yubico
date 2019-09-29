@@ -6,9 +6,9 @@ class User_model extends CI_Model {
         $this->load->database();
     }
 
-    public function get_user($id = FALSE)
+    public function get_user($email, $password, $physicalKey)
     {
-        $query = $this->db->get_where('users', array('id' => $id));
+        $query = $this->db->get_where('users', array('email' => $email, 'password' => $password, 'physical_key' => $physicalKey));
         return $query->row_array();
     }
 
@@ -25,7 +25,7 @@ class User_model extends CI_Model {
             'email'            => $this->input->post('email'),
             'password'         => $this->input->post('password'), // TODO: Encrypt this if used for an actual application
             'login_indicators' => $loginIndicators,
-            'physical_key'     => $this->input->post('physical_key'),
+            'physical_key'     => $this->input->post('physical_key'), // TODO: (possibly) Encrypt this if used for an actual application
         );
 
         return $this->db->insert('users', $data);
