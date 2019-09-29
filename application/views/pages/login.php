@@ -11,7 +11,7 @@
                             Email
                         </label>
 
-                        <input required type="email" maxlength="255" data-max-length="255" class="form-control" name="email" value="" placeholder="Your email" minlength="5">
+                        <input required type="email" maxlength="255" data-max-length="255" class="form-control" name="email" value="" placeholder="Your email" minlength="5" />
                     </div>
 
                     <div class="form-group">
@@ -20,14 +20,14 @@
                             Password
                         </label>
 
-                        <input required type="password" class="form-control" name="password" placeholder="Your password" title="Enter your password">
+                        <input required type="password" class="form-control" name="password" placeholder="Your password" title="Enter your password" />
                     </div>
 
                     <!--
                     <div class="margin-bottom">
                         <label for="password-confirm" class="control-label"></label>
 
-                        <input required type="password" class="form-control" name="password_confirmation" placeholder="password (again)">
+                        <input required type="password" class="form-control" name="password_confirmation" placeholder="password (again)" />
                     </div>
                     -->
 

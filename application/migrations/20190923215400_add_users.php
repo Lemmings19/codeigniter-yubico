@@ -17,21 +17,21 @@ class Migration_Add_users extends CI_Migration {
                 'type'       => 'VARCHAR',
                 'constraint' => '255',
             ),
-            'login_indicators' => array(
-                'type'         => 'VARCHAR',
-                'constraint' => '255',
-            ),
             'email' => array(
                 'type'       => 'VARCHAR',
                 'constraint' => '255',
             ),
             'password' => array(
                 'type' => 'TEXT',
-                'null' => TRUE,
+            ),
+            'login_indicators' => array(
+                'type'         => 'VARCHAR',
+                'constraint' => '255',
             ),
             'physical_key' => array(
                 'type'       => 'VARCHAR',
                 'constraint' => '255',
+                'null' => TRUE,
             ),
         ));
         $this->dbforge->add_key('id', TRUE);
