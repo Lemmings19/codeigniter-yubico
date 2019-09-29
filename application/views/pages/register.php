@@ -9,7 +9,7 @@
                 <?php echo validation_errors(); ?>
             </div>
 
-            <?php echo form_open('users/register'); ?>
+            <?php echo form_open('users/register', ['id' => 'registerForm']); ?>
 
                 <div id="basicInfo">
                     <div class="form-group">
@@ -48,48 +48,54 @@
                     -->
 
                     <div class="form-group">
-                        <span id="showAuthTypes" class="disabled btn btn-primary">
+                        <button id="showAuthTypes" type="button" class="disabled btn btn-primary">
                             Next
                             <span class="fas fa-arrow-right"></span>
-                        </span>
+                        </button>
                     </div>
                 </div>
 
                 <div id="authTypes" class="form-group" style="display:none;">
                     <div class="">
                         <label>
-                            <input type="checkbox" name="use_tfa" value="1" class="" /> Use Two-Factor Autentication
+                            <input type="checkbox" name="use_tfa" value="1" class="" />
+                            <span class="fal fa-fw fa-shield-check"></span>
+                            Use Two-Factor Autentication
                         </label>
                     </div>
 
                     <div class="">
                         <label>
-                            <input type="checkbox" name="use_sns" value="1" class="" /> Use Simple Notification Services
+                            <input type="checkbox" name="use_sns" value="1" class="" />
+                            <span class="fal fa-fw fa-envelope"></span>
+                            Use Simple Notification Services
                         </label>
                     </div>
 
                     <div class="">
                         <label>
-                            <input checked type="checkbox" name="use_physical_key" value="1" class="" /> Use Physical Key
+                            <input checked type="checkbox" name="use_physical_key" value="1" class="" />
+                            <span class="fal fa-fw fa-usb-drive"></span>
+                            Use Physical Key
                         </label>
                     </div>
 
                     <div class="form-group">
                         <ul class="list-inline">
                             <li class="list-inline-item">
-                                <span id="submitAuthTypes" class="btn btn-primary">
+                                <button id="submitAuthTypes" type="button" class="btn btn-primary">
                                     Next
                                     <span class="fas fa-arrow-right"></span>
-                                </span>
+                                </button>
                             </li>
                             <li class="list-inline-item">
-                                <span id="showBasicInfo" class="btn btn-link">
+                                <button id="showBasicInfo" type="button" class="btn btn-link">
                                     Back
-                                </span>
+                                </button>
                             </li>
 
                             <li class="list-inline-item">
-                                <button class="btn btn-primary">
+                                <button class="btn btn-success">
                                     (testing) Submit
                                 </button>
                             </li>
@@ -100,13 +106,19 @@
                     <div class="modal-dialog" role="document">
                         <div class="modal-content">
                             <div class="modal-header">
-                                <h5 class="modal-title">Insert phyiscal key</h5>
+                                <h5 class="modal-title">
+                                    <span class="fal fa-fw fa-usb-drive"></span>
+                                    Insert physical key
+                                </h5>
                                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                     <span aria-hidden="true">&times;</span>
                                 </button>
                             </div>
                             <div class="modal-body">
                                 <ol>
+                                    <li>
+                                        Do not type anything during this process, ensure the field below is selected and empty.
+                                    </li>
                                     <li>
                                         Insert your physical key into your computer's USB port or connect it with a USB cable.
                                     </li>
@@ -115,15 +127,26 @@
                                     </li>
                                 </ol>
 
-                                <div class="d-flex justify-content-center">
-                                    <div class="spinner-border text-primary" role="status">
-                                        <span class="sr-only">Loading...</span>
+                                <div class="form-group">
+                                    <input autocomplete="off" type="text" name="physical_key" maxlength="12" class="form-control">
+                                </div>
+
+                                <div class="d-flex justify-content-center form-group">
+                                    <div id="physKeyLoading" class="text-primary">
+                                        <span class="display-4 fad fa-spinner fa-pulse"></span>
+                                    </div>
+
+                                    <div id="physKeyLoaded" class="text-primary" style="display:none;">
+                                        <span class="display-4 fas fa-check-circle"></span>
                                     </div>
                                 </div>
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-link" data-dismiss="modal">Back</button>
-                                <button type="button" class="btn btn-primary">Continue</button>
+                                <button id="physKeySubmit" type="button" autocomplete="off" disabled class="btn btn-primary">
+                                    Continue
+                                    <span class="fas fa-arrow-right"></span>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -136,6 +159,19 @@
 
 <script>
     $(document).ready(function () {
+
+        // Prevent form submission when Enter is pressed
+        $(":text").on("keypress keyup", function (e) {
+            if (e.which == 13) {
+                return false;
+            }
+        });
+        $(":checkbox, :radio").on("keypress keyup", function (e) {
+            if (e.which == 13) {
+                return false;
+            }
+        });
+
         $("#basicInfo").change(function () {
             if ($("[name=name]").val() && $("[name=email]").val() && $("[name=password]").val()) {
                 $("#showAuthTypes").removeClass("disabled");
@@ -156,7 +192,29 @@
 
         $("#submitAuthTypes").click(function () {
             if ($("[name=use_physical_key]").is(":checked")) {
-                $('#physKeyModal').modal('show');
+                $("#physKeyModal").modal("show");
+                $("[name=phyiscal_key]").focus();
+            }
+        });
+
+        $("[name=phyiscal_key]").change(function () {
+            if ($(this).val().length == 12) {
+                $("#physKeyLoading").hide();
+                $("#physKeyLoaded").show();
+                $("[name=phyiscal_key]").blur();
+                $("#physKeySubmit").prop("disabled", false);
+            } else {
+                $("#physKeyLoading").show();
+                $("#physKeyLoaded").hide();
+                $("[name=phyiscal_key]").focus();
+                $("#physKeySubmit").prop("disabled", true);
+            }
+        });
+
+        $("#physKeySubmit").click(function() {
+            if (!$(this).is(":disabled")) {
+                console.log('submitting');
+                document.getElementById("registerForm").submit();
             }
         });
     });

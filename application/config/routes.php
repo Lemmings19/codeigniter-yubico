@@ -53,6 +53,7 @@ $route['default_controller'] = 'pages/view';
 $route['(:any)']             = 'pages/view/$1';
 $route['users/register']     = 'register/register';
 $route['users/login']        = 'login/login';
+$route['users/require-otp']  = 'api/check_phys_key_requirement';
 
 $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;

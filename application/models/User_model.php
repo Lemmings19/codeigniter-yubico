@@ -6,9 +6,14 @@ class User_model extends CI_Model {
         $this->load->database();
     }
 
-    public function get_user($email, $password, $physicalKey)
+    public function get_user($email, $password, $physicalKey = null)
     {
-        $query = $this->db->get_where('users', array('email' => $email, 'password' => $password, 'physical_key' => $physicalKey));
+        if ($physicalKey) {
+            $query = $this->db->get_where('users', ['email' => $email, 'password' => $password, 'physical_key' => $physicalKey]);
+        } else {
+            $query = $this->db->get_where('users', ['email' => $email, 'password' => $password]);
+        }
+
         return $query->row_array();
     }
 
@@ -25,9 +30,13 @@ class User_model extends CI_Model {
             'email'            => $this->input->post('email'),
             'password'         => $this->input->post('password'), // TODO: Encrypt this if used for an actual application
             'login_indicators' => $loginIndicators,
-            'physical_key'     => $this->input->post('physical_key'), // TODO: (possibly) Encrypt this if used for an actual application
+            'physical_key'     => $this->input->post('physical_key') ? $this->input->post('physical_key') : null,
         );
 
         return $this->db->insert('users', $data);
+    }
+
+    public static function requiresPhysKey($indicators) {
+        return str_split($indicators)[2] ? true : false;
     }
 }

@@ -22,6 +22,7 @@ class Login extends CI_Controller {
         if ($this->form_validation->run() === false || !$user)
         {
             $data['title'] = 'Login';
+            $data['error'] = 'User not found.';
             $this->load->view('templates/header', $data);
             $this->load->view('pages/login', $data);
             $this->load->view('templates/footer', $data);

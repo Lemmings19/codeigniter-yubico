@@ -13,6 +13,9 @@
 
     <!-- Icons -->
     <script src="https://kit.fontawesome.com/cfcbaf7b87.js" crossorigin="anonymous"></script>
+
+    <!-- U2F (Yubico) -->
+    <script src="<?php echo public_url(); ?>/js/u2f-api.js" crossorigin="anonymous"></script>
 </head>
 <body>
 <div class="container-fluid">

@@ -19,6 +19,7 @@ class Register extends CI_Controller {
         $this->form_validation->set_rules('use_tfa',          'Use Two-Factor Autentication',     null);
         $this->form_validation->set_rules('use_sns',          'Use Simple Notification Services', null);
         $this->form_validation->set_rules('use_physical_key', 'Use Physical Key',                 null);
+        $this->form_validation->set_rules('physical_key',     'Physical Key',                     'min_length[12]|max_length[12]');
 
         if ($this->form_validation->run() === false)
         {

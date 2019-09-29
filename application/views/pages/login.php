@@ -7,6 +7,9 @@
 
             <div class="text-danger">
                 <?php echo validation_errors(); ?>
+                <?php if (isset($error)){
+                    echo $error;
+                } ?>
             </div>
 
             <?php echo form_open('users/login'); ?>
@@ -43,9 +46,9 @@
                             Login
                             <span class="fas fa-sign-in-alt"></span>
                         </span>
-                        <button class="btn btn-primary">
-                                    (testing) Submit
-                                </button>
+                        <button class="btn btn-success">
+                            (testing) Submit
+                        </button>
                     </div>
                 </div>
 
