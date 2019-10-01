@@ -1,12 +1,18 @@
 <div class="container-fluid">
     <div class="row justify-content-center">
-        <div class="col-sm-6 col-md-4">
+        <div class="col-sm-8 col-md-6 col-lg-4">
             <h1>Register</h1>
 
             <?php $this->load->helper('form'); ?>
 
             <div class="text-danger">
                 <?php echo validation_errors(); ?>
+            </div>
+
+            <div id="error" class="text-danger">
+            </div>
+
+            <div id="done" class="text-success">
             </div>
 
             <?php echo form_open('users/register', ['id' => 'registerForm']); ?>
@@ -102,6 +108,12 @@
                     </div>
                 </div>
 
+                <div id="authTypesLoading" class="form-group" style="display:none;">
+                    <div class="text-primary">
+                        <span class="display-4 fad fa-spinner fa-pulse"></span>
+                    </div>
+                </div>
+
                 <div id="physKeyModal" class="modal" tabindex="-1" role="dialog">
                     <div class="modal-dialog" role="document">
                         <div class="modal-content">
@@ -117,9 +129,6 @@
                             <div class="modal-body">
                                 <ol>
                                     <li>
-                                        Do not type anything during this process, ensure the field below is selected and empty.
-                                    </li>
-                                    <li>
                                         Insert your physical key into your computer's USB port or connect it with a USB cable.
                                     </li>
                                     <li>
@@ -127,9 +136,15 @@
                                     </li>
                                 </ol>
 
+                                <div id="registerKey">
+                                    Do your thing: press button on key, swipe fingerprint or whatever
+                                </div>
+
+                                <!--
                                 <div class="form-group">
                                     <input autocomplete="off" type="text" name="physical_key" maxlength="12" class="form-control">
                                 </div>
+                                -->
 
                                 <div class="d-flex justify-content-center form-group">
                                     <div id="physKeyLoading" class="text-primary">
@@ -157,8 +172,13 @@
     </div>
 </div>
 
+<script src="<?php echo public_url(); ?>/js/register.js" crossorigin="anonymous"></script>
 <script>
     $(document).ready(function () {
+
+        /**
+         * View manipulation
+         */
 
         // Prevent form submission when Enter is pressed
         $(":text").on("keypress keyup", function (e) {
@@ -192,30 +212,115 @@
 
         $("#submitAuthTypes").click(function () {
             if ($("[name=use_physical_key]").is(":checked")) {
-                $("#physKeyModal").modal("show");
-                $("[name=phyiscal_key]").focus();
+                // Do pre-check
+
+                // Show modal
+                // $("#physKeyModal").modal("show");
+
+                // Prompt for key
+
+                // $("[name=phyiscal_key]").focus();
+
+
+
+                // var self = $(this);
+                // e.preventDefault();
+
+                /**
+                // For toggling whether we want to authenticate with a key or a platform (eg. the PC itself)
+                var crossPlatform = $("select[name=cross_platform]").val();
+                if (crossPlatform == "") {
+                    $("#error").show().text("Please choose cross-platform setting - see note below about what this means");
+                    return;
+                }
+                */
+
+
+                var crossPlatform = true;
+
+                $("#authTypes,#authTypesLoading").toggle();
+
+                $("#error").empty().hide();
+                $.ajax({url: "/api/register_username",
+                    method: "GET",
+                    data: {
+                        name :             $("[name=name]").val(),
+                        email :            $("[name=email]").val(),
+                        password :         $("[name=password]").val(),
+                        use_tfa :          $("[name=use_tfa]").val(),
+                        use_sns :          $("[name=use_sns]").val(),
+                        use_physical_key : $("[name=use_physical_key]").val(),
+                        crossplatform :    crossPlatform},
+                    dataType: "json",
+                    success: function(result) {
+                        $("#authTypes,#authTypesLoading").toggle();
+                        $("#physKeyModal").modal("show");
+
+                        /* activate the key and get the response */
+                        webauthnRegister(result.challenge, function(success, info) {
+                            if (success) {
+                                $.ajax({url: "/api/register",
+                                    method: "POST",
+                                    data: {
+                                        name :     $("[name=name]").val(),
+                                        email :    $("[name=email]").val(),
+                                        password : $("[name=password]").val(),
+                                        register : info
+                                    },
+                                    dataType: "json",
+                                    success: function(result){
+                                        $("#physKeyLoading").hide();
+                                        $("#physKeyLoaded").show();
+                                        $("#done").text("Registration completed successfully").show();
+                                        // setTimeout(function(){ $("#done").hide(300); }, 2000);
+
+                                        // TODO: Redirect to login
+                                    },
+                                    error: function(xhr, status, error){
+                                        $("#physKeyModal").modal("hide");
+                                        $("#error").text("Registration failed: " + error + ": " + xhr.responseText).show();
+                                    }
+                                });
+                            } else {
+                                $("#error").text(info).show();
+                            }
+                        });
+                    },
+                    error: function(xhr, status, error) {
+                        $("#authTypes,#authTypesLoading").toggle();
+                        $("#error").text("Couldn't initiate registration: " + error + ": " + xhr.responseText).show();
+                    }
+                });
             }
         });
 
-        $("[name=phyiscal_key]").change(function () {
-            if ($(this).val().length == 12) {
-                $("#physKeyLoading").hide();
-                $("#physKeyLoaded").show();
-                $("[name=phyiscal_key]").blur();
-                $("#physKeySubmit").prop("disabled", false);
-            } else {
-                $("#physKeyLoading").show();
-                $("#physKeyLoaded").hide();
-                $("[name=phyiscal_key]").focus();
-                $("#physKeySubmit").prop("disabled", true);
-            }
-        });
+        // $("[name=phyiscal_key]").change(function () {
+        //     if ($(this).val().length == 12) {
+        //         $("#physKeyLoading").hide();
+        //         $("#physKeyLoaded").show();
+        //         $("[name=phyiscal_key]").blur();
+        //         $("#physKeySubmit").prop("disabled", false);
+        //     } else {
+        //         $("#physKeyLoading").show();
+        //         $("#physKeyLoaded").hide();
+        //         $("[name=phyiscal_key]").focus();
+        //         $("#physKeySubmit").prop("disabled", true);
+        //     }
+        // });
 
         $("#physKeySubmit").click(function() {
             if (!$(this).is(":disabled")) {
                 console.log('submitting');
                 document.getElementById("registerForm").submit();
             }
+        });
+
+        /**
+         * Key stuff
+         */
+
+        $("#registerForm").submit(function(e){
+
         });
     });
 </script>

@@ -1,6 +1,6 @@
 <div class="container-fluid">
     <div class="row justify-content-center">
-        <div class="col-sm-6 col-md-4">
+        <div class="col-sm-8 col-md-6 col-lg-4">
             <h1>Login</h1>
 
             <?php $this->load->helper('form'); ?>
@@ -12,7 +12,13 @@
                 } ?>
             </div>
 
-            <?php echo form_open('users/login'); ?>
+            <div id="error" class="text-danger">
+            </div>
+
+            <div id="done" class="text-success">
+            </div>
+
+            <?php echo form_open('users/login', ['id' => 'loginForm']); ?>
 
                 <div id="basicInfo">
                     <div class="form-group">
@@ -71,6 +77,10 @@
                                     </li>
                                 </ol>
 
+                                <div id="loginKey">
+                                    Do your thing: press button on key, swipe fingerprint or whatever
+                                </div>
+
                                 <div class="d-flex justify-content-center">
                                     <div class="spinner-border text-primary" role="status">
                                         <span class="sr-only">Loading...</span>
@@ -96,6 +106,45 @@
             if (true) {
                 $('#physKeyModal').modal('show');
             }
+        });
+
+        $("#loginForm").submit(function(e){
+            var self = $(this);
+            e.preventDefault();
+            $("#error").empty().hide();
+            $.ajax({url: "/",
+                method: "POST",
+                data: {loginusername: self.find("[name=loginusername]").val()},
+                dataType: "json",
+                success: function(result){
+                    $("#loginForm,#loginKey").toggle();
+                    /* activate the key and get the response */
+                    webauthnAuthenticate(result.challenge, function(success, info){
+                        if (success) {
+                            $.ajax({url: "/",
+                                method: "POST",
+                                data: {login: info},
+                                dataType: "json",
+                                success: function(result){
+                                    $("#loginForm,#loginKey").toggle();
+                                    $("#done").text("login completed successfully").show();
+                                    setTimeout(function(){ $("#done").hide(300); }, 2000);
+                                },
+                                error: function(xhr, status, error){
+                                    $("#error").text("login failed: " + error + ": " + xhr.responseText).show();
+                                }
+                            });
+                        } else {
+                            $("#error").text(info).show();
+                        }
+                    });
+                },
+                error: function(xhr, status, error){
+                    $("#loginForm").show();
+                    $("#loginKey").hide();
+                    $("#error").text("couldn't initiate login: " + error + ": " + xhr.responseText).show();
+                }
+            });
         });
     });
 </script>

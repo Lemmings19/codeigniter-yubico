@@ -17,23 +17,24 @@ class User_model extends CI_Model {
         return $query->row_array();
     }
 
-    public function set_user()
+    public function set_user($name, $email, $password, $useTfa, $useSns, $usePhysicalKey, $physicalKey = null)
     {
-        $useTfa = $this->input->post('use_tfa');
-        $useSns = $this->input->post('use_sns');
-        $usePhysicalKey = $this->input->post('use_physical_key');
-
         $loginIndicators = ($useTfa ? 1 : 0) . ($useSns ? 1 : 0) . ($usePhysicalKey ? 1 : 0);
 
         $data = array(
-            'name'             => $this->input->post('name'),
-            'email'            => $this->input->post('email'),
-            'password'         => $this->input->post('password'), // TODO: Encrypt this if used for an actual application
+            'name'             => $name,
+            'email'            => $email,
+            'password'         => $password, // TODO: Encrypt this if used for an actual application
             'login_indicators' => $loginIndicators,
-            'physical_key'     => $this->input->post('physical_key') ? $this->input->post('physical_key') : null,
+            'physical_key'     => $physicalKey,
         );
 
         return $this->db->insert('users', $data);
+    }
+
+    public function update_physical_key($id, $physicalKey) {
+        $this->db->where('id', $id);
+        return $this->db->update('users', ['phyiscal_key' => $physicalKey]);
     }
 
     public static function requiresPhysKey($indicators) {

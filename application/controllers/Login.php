@@ -13,9 +13,9 @@ class Login extends CI_Controller {
         $this->load->helper('form');
         $this->load->library('form_validation');
 
-        $this->form_validation->set_rules('email',        'Email',            'required|callback_email_exists');
-        $this->form_validation->set_rules('password',     'Password',         'required|min_length[8]|max_length[255]');
-        $this->form_validation->set_rules('physical_key', 'Physical Key',     null);
+        $this->form_validation->set_rules('email',        'Email',        'required|callback_email_exists');
+        $this->form_validation->set_rules('password',     'Password',     'required|min_length[8]|max_length[255]');
+        $this->form_validation->set_rules('physical_key', 'Physical Key', null);
 
         $user = $this->user_model->get_user($this->input->post('email'), $this->input->post('password'), $this->input->post('physical_key'));
 
