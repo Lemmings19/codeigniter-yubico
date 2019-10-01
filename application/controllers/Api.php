@@ -52,12 +52,13 @@ class Api extends CI_Controller {
         $usePhysicalKey = $this->input->get('use_physical_key');
 
         // Create the user
-        $user = $this->user_model->set_user($name, $email, $password, $useTfa, $useSns, $usePhysicalKey, null);
+        $this->user_model->set_user($name, $email, $password, $useTfa, $useSns, $usePhysicalKey, null);
+        $user = $this->user_model->get_user($email, $password);
 
         $_SESSION['name'] = $name;
 
         header('Content-type: application/json');
-        echo json_encode(['challenge' => $webauthn->prepareChallengeForRegistration($user['id'], $user['id'], $crossPlatform)]);
+        echo json_encode(['challenge' => $webauthn->prepareChallengeForRegistration($user['name'], $user['id'], $crossPlatform)]);
         exit;
     }
 
@@ -73,6 +74,8 @@ class Api extends CI_Controller {
         $name        = $this->input->get('name');
         $password    = $this->input->get('password');
         $physicalKey = $webauthn->register($this->input->get('register'), '');
+
+        $user = $this->user_model->get_user($email, $password);
 
         // Save the result to enable a challenge to be raised against this newly created key in order to log in
         $this->user_model->update_physical_key($user['id'], $physicalKey);

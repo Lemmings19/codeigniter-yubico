@@ -12,10 +12,10 @@
                 } ?>
             </div>
 
-            <div id="error" class="text-danger">
+            <div class="js-error alert alert-danger" style="display:none;">
             </div>
 
-            <div id="done" class="text-success">
+            <div id="done" class="alert alert-success" style="display:none;">
             </div>
 
             <?php echo form_open('users/login', ['id' => 'loginForm']); ?>
@@ -68,6 +68,9 @@
                                 </button>
                             </div>
                             <div class="modal-body">
+                                <div class="js-error alert alert-danger" style="display:none;">
+                                </div>
+
                                 <ol>
                                     <li>
                                         Insert your physical key into your computer's USB port or connect it with a USB cable.
@@ -111,7 +114,7 @@
         $("#loginForm").submit(function(e){
             var self = $(this);
             e.preventDefault();
-            $("#error").empty().hide();
+            $(".js-error").empty().hide();
             $.ajax({url: "/",
                 method: "POST",
                 data: {loginusername: self.find("[name=loginusername]").val()},
@@ -131,18 +134,18 @@
                                     setTimeout(function(){ $("#done").hide(300); }, 2000);
                                 },
                                 error: function(xhr, status, error){
-                                    $("#error").text("login failed: " + error + ": " + xhr.responseText).show();
+                                    $(".js-error").text("login failed: " + error + ": " + xhr.responseText).show();
                                 }
                             });
                         } else {
-                            $("#error").text(info).show();
+                            $(".js-error").text(info).show();
                         }
                     });
                 },
                 error: function(xhr, status, error){
                     $("#loginForm").show();
                     $("#loginKey").hide();
-                    $("#error").text("couldn't initiate login: " + error + ": " + xhr.responseText).show();
+                    $(".js-error").text("couldn't initiate login: " + error + ": " + xhr.responseText).show();
                 }
             });
         });

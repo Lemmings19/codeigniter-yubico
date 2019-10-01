@@ -9,10 +9,10 @@
                 <?php echo validation_errors(); ?>
             </div>
 
-            <div id="error" class="text-danger">
+            <div class="js-error alert alert-danger" style="display:none">
             </div>
 
-            <div id="done" class="text-success">
+            <div id="done" class="alert alert-success" style="display:none">
             </div>
 
             <?php echo form_open('users/register', ['id' => 'registerForm']); ?>
@@ -127,6 +127,9 @@
                                 </button>
                             </div>
                             <div class="modal-body">
+                                <div class="js-error alert alert-danger">
+                                </div>
+
                                 <ol>
                                     <li>
                                         Insert your physical key into your computer's USB port or connect it with a USB cable.
@@ -135,10 +138,6 @@
                                         Once connected, tap the button or gold disk if your key has one.
                                     </li>
                                 </ol>
-
-                                <div id="registerKey">
-                                    Do your thing: press button on key, swipe fingerprint or whatever
-                                </div>
 
                                 <!--
                                 <div class="form-group">
@@ -230,7 +229,7 @@
                 // For toggling whether we want to authenticate with a key or a platform (eg. the PC itself)
                 var crossPlatform = $("select[name=cross_platform]").val();
                 if (crossPlatform == "") {
-                    $("#error").show().text("Please choose cross-platform setting - see note below about what this means");
+                    $(".js-error").show().text("Please choose cross-platform setting - see note below about what this means");
                     return;
                 }
                 */
@@ -240,7 +239,7 @@
 
                 $("#authTypes,#authTypesLoading").toggle();
 
-                $("#error").empty().hide();
+                $(".js-error").empty().hide();
                 $.ajax({url: "/api/register_username",
                     method: "GET",
                     data: {
@@ -278,17 +277,17 @@
                                     },
                                     error: function(xhr, status, error){
                                         $("#physKeyModal").modal("hide");
-                                        $("#error").text("Registration failed: " + error + ": " + xhr.responseText).show();
+                                        $(".js-error").text("Registration failed: " + error + ": " + xhr.responseText).show();
                                     }
                                 });
                             } else {
-                                $("#error").text(info).show();
+                                $(".js-error").text(info).show();
                             }
                         });
                     },
                     error: function(xhr, status, error) {
                         $("#authTypes,#authTypesLoading").toggle();
-                        $("#error").text("Couldn't initiate registration: " + error + ": " + xhr.responseText).show();
+                        $(".js-error").text("Couldn't initiate registration: " + error + ": " + xhr.responseText).show();
                     }
                 });
             }
