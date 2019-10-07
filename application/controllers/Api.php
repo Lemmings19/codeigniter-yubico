@@ -31,6 +31,7 @@ class Api extends CI_Controller {
 
     // Initiate registration
     public function register_username() {
+        session_start();
         $webauthn = new WebAuthn($_SERVER['HTTP_HOST']);
 
         if (!$this->input->get('name') || !$this->input->get('password')) {
@@ -88,7 +89,73 @@ class Api extends CI_Controller {
         exit;
     }
 
-    public function login() {
+    public function login_username() {
+        session_start();
+        $webauthn = new WebAuthn($_SERVER['HTTP_HOST']);
 
+        if (!$this->input->get('email') || !$this->input->get('password')) {
+            set_status_header(400);
+            echo 'Email or password missing';
+            return false;
+        }
+        $email    = $this->input->get('email');
+        $password = $this->input->get('password');
+
+        $user = $this->user_model->get_user($email, $password);
+
+        $_SESSION['loginname'] = $user['name'];
+        /* note: that will emit an error if username does not exist. That's not
+        good practice for a live system, as you don't want to have a way for
+        people to interrogate your user database for existence */
+        $challenge = $webauthn->prepareForLogin($user['physical_key']);
+
+        header('Content-type: application/json');
+        echo json_encode(['challenge' => $challenge]);
+        exit;
+    }
+
+    public function login() {
+        session_start();
+        $webauthn = new WebAuthn($_SERVER['HTTP_HOST']);
+
+        $name = $_SESSION['loginname'];
+        if (empty($name)) {
+            set_status_header(400);
+            echo 'Username not set';
+            return false;
+        }
+
+        if (!$this->input->get('email') || !$this->input->get('password')) {
+            set_status_header(400);
+            echo 'Email or password missing';
+            return false;
+        }
+        $email    = $this->input->get('email');
+        $password = $this->input->get('password');
+
+        $user = $this->user_model->get_user($email, $password);
+
+        if (!$user) {
+            set_status_header(400);
+            echo 'Bad email or password';
+        }
+
+        if (!$this->input->get('key_info')) {
+            set_status_header(400);
+            echo 'Key information missing';
+            return false;
+        }
+
+        $physKey = $this->input->get('key_info');
+
+        if (!$webauthn->authenticate($physKey, $user['physical_key'])) {
+            http_response_code(401);
+            echo 'failed to authenticate with that key';
+            exit;
+        }
+
+        header('Content-type: application/json');
+        echo json_encode('ok');
+        exit;
     }
 }

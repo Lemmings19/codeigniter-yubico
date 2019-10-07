@@ -17,6 +17,11 @@ class User_model extends CI_Model {
         return $query->row_array();
     }
 
+    public function get_user_by_name($name) {
+        $query = $this->db->get_where('users', ['name' => $username]);
+        return $query->row_array();
+    }
+
     public function set_user($name, $email, $password, $useTfa, $useSns, $usePhysicalKey, $randId, $physicalKey = null)
     {
         $loginIndicators = ($useTfa ? 1 : 0) . ($useSns ? 1 : 0) . ($usePhysicalKey ? 1 : 0);
