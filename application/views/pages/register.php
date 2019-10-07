@@ -20,7 +20,7 @@
                 <div id="basicInfo">
                     <div class="form-group">
                         <label for="name" class="control-label">
-                            <span class="text-grey fal fa-fw fa-id-card"></span>
+                            <span class="text-grey fas fa-fw fa-id-card"></span>
                             Name
                         </label>
 
@@ -29,7 +29,7 @@
 
                     <div class="form-group">
                         <label for="email" class="control-label">
-                            <span class="text-grey fal fa-fw fa-at"></span>
+                            <span class="text-grey fas fa-fw fa-at"></span>
                             Email
                         </label>
 
@@ -38,7 +38,7 @@
 
                     <div class="form-group">
                         <label for="password" class="control-label">
-                            <span class="text-grey fal fa-fw fa-key"></span>
+                            <span class="text-grey fas fa-fw fa-key"></span>
                             Password
                         </label>
 
@@ -65,7 +65,7 @@
                     <div class="">
                         <label>
                             <input type="checkbox" name="use_tfa" value="1" class="" />
-                            <span class="fal fa-fw fa-shield-check"></span>
+                            <span class="fas fa-fw fa-shield-check"></span>
                             Use Two-Factor Autentication
                         </label>
                     </div>
@@ -73,7 +73,7 @@
                     <div class="">
                         <label>
                             <input type="checkbox" name="use_sns" value="1" class="" />
-                            <span class="fal fa-fw fa-envelope"></span>
+                            <span class="fas fa-fw fa-envelope"></span>
                             Use Simple Notification Services
                         </label>
                     </div>
@@ -81,7 +81,7 @@
                     <div class="">
                         <label>
                             <input checked type="checkbox" name="use_physical_key" value="1" class="" />
-                            <span class="fal fa-fw fa-usb-drive"></span>
+                            <span class="fas fa-fw fa-usb-drive"></span>
                             Use Physical Key
                         </label>
                     </div>
@@ -119,7 +119,7 @@
                         <div class="modal-content">
                             <div class="modal-header">
                                 <h5 class="modal-title">
-                                    <span class="fal fa-fw fa-usb-drive"></span>
+                                    <span class="fas fa-fw fa-usb-drive"></span>
                                     Insert physical key
                                 </h5>
                                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -171,7 +171,7 @@
     </div>
 </div>
 
-<script src="<?php echo public_url(); ?>/js/register.js" crossorigin="anonymous"></script>
+<script src="<?php echo public_url(); ?>js/register.js" crossorigin="anonymous"></script>
 <script>
     $(document).ready(function () {
 
@@ -218,7 +218,7 @@
 
                 // Prompt for key
 
-                // $("[name=phyiscal_key]").focus();
+                // $("[name=physical_key]").focus();
 
 
 
@@ -240,7 +240,9 @@
                 $("#authTypes,#authTypesLoading").toggle();
 
                 $(".js-error").empty().hide();
-                $.ajax({url: "/api/register_username",
+
+                $.ajax({
+                    url: "/api/register_username",
                     method: "GET",
                     data: {
                         name :             $("[name=name]").val(),
@@ -258,8 +260,9 @@
                         /* activate the key and get the response */
                         webauthnRegister(result.challenge, function(success, info) {
                             if (success) {
-                                $.ajax({url: "/api/register",
-                                    method: "POST",
+                                $.ajax({
+                                    url: "/api/register",
+                                    method: "GET",
                                     data: {
                                         name :     $("[name=name]").val(),
                                         email :    $("[name=email]").val(),
@@ -270,6 +273,7 @@
                                     success: function(result){
                                         $("#physKeyLoading").hide();
                                         $("#physKeyLoaded").show();
+                                        $("#physKeyModal").modal("hide");
                                         $("#done").text("Registration completed successfully").show();
                                         // setTimeout(function(){ $("#done").hide(300); }, 2000);
 
@@ -277,7 +281,7 @@
                                     },
                                     error: function(xhr, status, error){
                                         $("#physKeyModal").modal("hide");
-                                        $(".js-error").text("Registration failed: " + error + ": " + xhr.responseText).show();
+                                        $(".js-error").html("Registration failed: " + error + ": " + xhr.responseText).show();
                                     }
                                 });
                             } else {
@@ -287,22 +291,22 @@
                     },
                     error: function(xhr, status, error) {
                         $("#authTypes,#authTypesLoading").toggle();
-                        $(".js-error").text("Couldn't initiate registration: " + error + ": " + xhr.responseText).show();
+                        $(".js-error").html("Couldn't initiate registration: " + error + ": " + xhr.responseText).show();
                     }
                 });
             }
         });
 
-        // $("[name=phyiscal_key]").change(function () {
+        // $("[name=physical_key]").change(function () {
         //     if ($(this).val().length == 12) {
         //         $("#physKeyLoading").hide();
         //         $("#physKeyLoaded").show();
-        //         $("[name=phyiscal_key]").blur();
+        //         $("[name=physical_key]").blur();
         //         $("#physKeySubmit").prop("disabled", false);
         //     } else {
         //         $("#physKeyLoading").show();
         //         $("#physKeyLoaded").hide();
-        //         $("[name=phyiscal_key]").focus();
+        //         $("[name=physical_key]").focus();
         //         $("#physKeySubmit").prop("disabled", true);
         //     }
         // });

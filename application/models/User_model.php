@@ -17,7 +17,7 @@ class User_model extends CI_Model {
         return $query->row_array();
     }
 
-    public function set_user($name, $email, $password, $useTfa, $useSns, $usePhysicalKey, $physicalKey = null)
+    public function set_user($name, $email, $password, $useTfa, $useSns, $usePhysicalKey, $randId, $physicalKey = null)
     {
         $loginIndicators = ($useTfa ? 1 : 0) . ($useSns ? 1 : 0) . ($usePhysicalKey ? 1 : 0);
 
@@ -27,6 +27,7 @@ class User_model extends CI_Model {
             'password'         => $password, // TODO: Encrypt this if used for an actual application
             'login_indicators' => $loginIndicators,
             'physical_key'     => $physicalKey,
+            'rand_id'          => $randId,
         );
 
         return $this->db->insert('users', $data);
@@ -34,7 +35,7 @@ class User_model extends CI_Model {
 
     public function update_physical_key($id, $physicalKey) {
         $this->db->where('id', $id);
-        return $this->db->update('users', ['phyiscal_key' => $physicalKey]);
+        return $this->db->update('users', ['physical_key' => $physicalKey]);
     }
 
     public static function requiresPhysKey($indicators) {

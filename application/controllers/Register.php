@@ -38,9 +38,10 @@ class Register extends CI_Controller {
             $useSns         = $this->input->post('use_sns');
             $usePhysicalKey = $this->input->post('use_physical_key');
             $physicalKey    = ($this->input->post('physical_key') ? $this->input->post('physical_key') : null);
+            $randId         = time() . '-'. rand(1,1000000000);
 
             // Create the user
-            $this->user_model->set_user($name, $email, $password, $useTfa, $useSns, $usePhysicalKey, $physicalKey);
+            $this->user_model->set_user($name, $email, $password, $useTfa, $useSns, $usePhysicalKey, $randId, $physicalKey);
 
             $this->load->view('templates/header', $data);
             $this->load->view('pages/login', $data);

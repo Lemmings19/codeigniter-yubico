@@ -42,23 +42,25 @@ class Api extends CI_Controller {
         $name = $this->input->get('name');
         $password = $this->input->get('password');
 
-        $crossPlatform = (!empty($this->input->get('crossplatform')) && $this->input->get('crossplatform'));
-
         $name           = $this->input->get('name');
         $email          = $this->input->get('email');
         $password       = $this->input->get('password');
         $useTfa         = $this->input->get('use_tfa');
         $useSns         = $this->input->get('use_sns');
         $usePhysicalKey = $this->input->get('use_physical_key');
+        $randId         = time() . '-' . rand(1,1000000000);
 
         // Create the user
-        $this->user_model->set_user($name, $email, $password, $useTfa, $useSns, $usePhysicalKey, null);
+        $this->user_model->set_user($name, $email, $password, $useTfa, $useSns, $usePhysicalKey, $randId, null);
         $user = $this->user_model->get_user($email, $password);
 
         $_SESSION['name'] = $name;
 
+        $crossPlatform = (!empty($this->input->get('crossplatform')) && $this->input->get('crossplatform'));
+        $challenge = $webauthn->prepareChallengeForRegistration($user['name'], $user['id'], $crossPlatform);
+
         header('Content-type: application/json');
-        echo json_encode(['challenge' => $webauthn->prepareChallengeForRegistration($user['name'], $user['id'], $crossPlatform)]);
+        echo json_encode(['challenge' => $challenge]);
         exit;
     }
 
@@ -72,6 +74,7 @@ class Api extends CI_Controller {
             return false;
         }
         $name        = $this->input->get('name');
+        $email       = $this->input->get('email');
         $password    = $this->input->get('password');
         $physicalKey = $webauthn->register($this->input->get('register'), '');
 

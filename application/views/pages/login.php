@@ -23,7 +23,7 @@
                 <div id="basicInfo">
                     <div class="form-group">
                         <label for="email" class="control-label">
-                            <span class="text-grey fal fa-fw fa-at"></span>
+                            <span class="text-grey fas fa-fw fa-at"></span>
                             Email
                         </label>
 
@@ -32,7 +32,7 @@
 
                     <div class="form-group">
                         <label for="password" class="control-label">
-                            <span class="text-grey fal fa-fw fa-key"></span>
+                            <span class="text-grey fas fa-fw fa-key"></span>
                             Password
                         </label>
 

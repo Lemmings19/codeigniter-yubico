@@ -79,9 +79,9 @@ function webauthnRegister(key, callback){
                 ("name" in aErr) && (aErr.name == "AbortError" || aErr.name == "NS_ERROR_ABORT")
                 || aErr.name == 'NotAllowedError'
             ) {
-                callback(false, 'abort');
+                callback(false, "aborted: " + aErr.toString()); // abort
             } else {
-                callback(false, aErr.toString());
+                callback(false, "other error: " + aErr.toString());
             }
         });
 }

@@ -22,7 +22,8 @@ class Migration_Add_users extends CI_Migration {
                 'constraint' => '255',
             ),
             'password' => array(
-                'type' => 'TEXT',
+                'type'         => 'VARCHAR',
+                'constraint' => '255',
             ),
             'login_indicators' => array(
                 'type'         => 'VARCHAR',
@@ -30,13 +31,28 @@ class Migration_Add_users extends CI_Migration {
             ),
             'physical_key' => array(
                 'type'       => 'VARCHAR',
-                'constraint' => '255',
+                'constraint' => '2000',
                 'null' => TRUE,
             ),
         ));
         $this->dbforge->add_key('id', TRUE);
         $this->dbforge->create_table('users');
     }
+
+    /*
+    CREATE TABLE `users` (
+      `id` int(10) UNSIGNED NOT NULL,
+      `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+      `email` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+      `login_indicators` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+      `password` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+      `physical_key` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+    ALTER TABLE `users`
+        ADD PRIMARY KEY (`id`);
+    ALTER TABLE `users`
+        MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
+    */
 
     public function down()
     {
