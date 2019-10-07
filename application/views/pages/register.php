@@ -90,20 +90,14 @@
                         <div class="form-group">
                             <ul class="list-inline">
                                 <li class="list-inline-item">
-                                    <button id="submitAuthTypes" type="button" class="btn btn-primary">
-                                        Next
+                                    <button type="submit" class="btn btn-primary">
+                                        Submit
                                         <span class="fas fa-arrow-right"></span>
                                     </button>
                                 </li>
                                 <li class="list-inline-item">
                                     <button id="showBasicInfo" type="button" class="btn btn-link">
                                         Back
-                                    </button>
-                                </li>
-
-                                <li class="list-inline-item">
-                                    <button class="btn btn-success">
-                                        (testing) Submit
                                     </button>
                                 </li>
                         </div>
@@ -140,12 +134,6 @@
                                         </li>
                                     </ol>
 
-                                    <!--
-                                    <div class="form-group">
-                                        <input autocomplete="off" type="text" name="physical_key" maxlength="12" class="form-control">
-                                    </div>
-                                    -->
-
                                     <div class="d-flex justify-content-center form-group">
                                         <div id="physKeyLoading" class="text-primary">
                                             <span class="display-4 fad fa-spinner fa-pulse"></span>
@@ -158,10 +146,6 @@
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-link" data-dismiss="modal">Back</button>
-                                    <!-- <button id="physKeySubmit" type="button" autocomplete="off" disabled class="btn btn-primary">
-                                        Continue
-                                        <span class="fas fa-arrow-right"></span>
-                                    </button> -->
                                 </div>
                             </div>
                         </div>
@@ -196,7 +180,7 @@
             if ($("[name=name]").val() && $("[name=email]").val() && $("[name=password]").val()) {
                 $("#showAuthTypes").removeClass("disabled");
             }
-        });
+        }).change();
 
         $("#showAuthTypes").click(function () {
             if (!$(this).hasClass("disabled")) {
@@ -210,27 +194,15 @@
             $("#basicInfo").show();
         });
 
-        $("#submitAuthTypes").click(function () {
+        $("#registerForm").submit(function (e) {
             if ($("[name=use_physical_key]").is(":checked")) {
-                // Do pre-check
+                e.preventDefault();
 
-                // Show modal
-                // $("#physKeyModal").modal("show");
-
-                // Prompt for key
-
-                // $("[name=physical_key]").focus();
-
-
-
-                // var self = $(this);
-                // e.preventDefault();
-
-                /**
+                /*
                 // For toggling whether we want to authenticate with a key or a platform (eg. the PC itself)
                 var crossPlatform = $("select[name=cross_platform]").val();
                 if (crossPlatform == "") {
-                    $(".js-error").show().text("Please choose cross-platform setting - see note below about what this means");
+                    $(".js-error").show().text("Please choose cross-platform setting");
                     return;
                 }
                 */
@@ -249,16 +221,16 @@
                         name :             $("[name=name]").val(),
                         email :            $("[name=email]").val(),
                         password :         $("[name=password]").val(),
-                        use_tfa :          $("[name=use_tfa]").val(),
-                        use_sns :          $("[name=use_sns]").val(),
-                        use_physical_key : $("[name=use_physical_key]").val(),
+                        use_tfa :          $("[name=use_tfa]").prop("checked") ? 1 : 0,
+                        use_sns :          $("[name=use_sns]").prop("checked") ? 1 : 0,
+                        use_physical_key : $("[name=use_physical_key]").prop("checked") ? 1 : 0,
                         crossplatform :    crossPlatform},
                     dataType: "json",
                     success: function(result) {
                         $("#authTypes,#authTypesLoading").toggle();
                         $("#physKeyModal").modal("show");
 
-                        /* activate the key and get the response */
+                        // Activate the key and get the response
                         webauthnRegister(result.challenge, function(success, info) {
                             if (success) {
                                 $.ajax({
@@ -276,6 +248,7 @@
                                         $("#physKeyLoaded").show();
                                         $("#physKeyModal").modal("hide");
                                         $("#done").text("Registration completed successfully").show();
+
                                         $("#registerFormFieldset").prop("disabled", true);
 
                                         // TODO: Redirect to login?
@@ -296,35 +269,6 @@
                     }
                 });
             }
-        });
-
-        // $("[name=physical_key]").change(function () {
-        //     if ($(this).val().length == 12) {
-        //         $("#physKeyLoading").hide();
-        //         $("#physKeyLoaded").show();
-        //         $("[name=physical_key]").blur();
-        //         $("#physKeySubmit").prop("disabled", false);
-        //     } else {
-        //         $("#physKeyLoading").show();
-        //         $("#physKeyLoaded").hide();
-        //         $("[name=physical_key]").focus();
-        //         $("#physKeySubmit").prop("disabled", true);
-        //     }
-        // });
-
-        $("#physKeySubmit").click(function() {
-            if (!$(this).is(":disabled")) {
-                console.log('submitting');
-                document.getElementById("registerForm").submit();
-            }
-        });
-
-        /**
-         * Key stuff
-         */
-
-        $("#registerForm").submit(function(e){
-
         });
     });
 </script>

@@ -31,15 +31,6 @@
                             <input required type="email" maxlength="255" data-max-length="255" class="form-control" name="email" value="" placeholder="Your email" minlength="5" />
                         </div>
 
-                        <!-- <div class="form-group">
-                            <label for="name" class="control-label">
-                                <span class="text-grey fas fa-fw fa-at"></span>
-                                Name
-                            </label>
-
-                            <input required type="name" maxlength="255" data-max-length="255" class="form-control" name="name" value="" placeholder="Your name" minlength="1" />
-                        </div> -->
-
                         <div class="form-group">
                             <label for="password" class="control-label">
                                 <span class="text-grey fas fa-fw fa-key"></span>
@@ -49,21 +40,10 @@
                             <input required type="password" class="form-control" name="password" placeholder="Your password" title="Enter your password" />
                         </div>
 
-                        <!--
-                        <div class="margin-bottom">
-                            <label for="password-confirm" class="control-label"></label>
-
-                            <input required type="password" class="form-control" name="password_confirmation" placeholder="password (again)" />
-                        </div>
-                        -->
-
                         <div class="form-group">
-                            <span id="login" class="btn btn-primary">
+                            <button class="btn btn-primary">
                                 Login
                                 <span class="fas fa-sign-in-alt"></span>
-                            </span>
-                            <button class="btn btn-success">
-                                (testing) Submit
                             </button>
                         </div>
                     </div>
@@ -108,7 +88,6 @@
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-link" data-dismiss="modal">Back</button>
-                                    <!-- <button type="button" class="btn btn-primary">Continue</button> -->
                                 </div>
                             </div>
                         </div>
@@ -139,7 +118,8 @@
                 success: function(result) {
                     $("#authTypesLoading").toggle();
                     $("#physKeyModal").modal("show");
-                    /* activate the key and get the response */
+                    
+                    // Activate the key and get the response
                     webauthnAuthenticate(result.challenge, function(success, info){
                         if (success) {
                             $.ajax({
@@ -152,18 +132,18 @@
                                 },
                                 dataType: "json",
                                 success: function(result){
-                                    $("#loginForm,#loginKey").toggle();
-                                    $("#done").text("login completed successfully").show();
-                                    setTimeout(function(){ $("#done").hide(300); }, 2000);
-
                                     $("#physKeyLoading").hide();
                                     $("#physKeyLoaded").show();
                                     $("#physKeyModal").modal("hide");
                                     $("#done").text("Logged in!").show();
+
                                     $("#loginFormFieldset").prop("disabled", true);
+
+                                    // Redirect to dashboard?
+                                    window.location.href = "<?php echo base_url(); ?>/dashboard";
                                 },
                                 error: function(xhr, status, error){
-                                    $(".js-error").html("login failed: " + error + ": " + xhr.responseText).show();
+                                    $(".js-error").html("Login failed: " + error + ": " + xhr.responseText).show();
                                 }
                             });
                         } else {
@@ -174,7 +154,7 @@
                 error: function(xhr, status, error){
                     $("#loginForm").show();
                     $("#loginKey").hide();
-                    $(".js-error").html("couldn't initiate login: " + error + ": " + xhr.responseText).show();
+                    $(".js-error").html("Couldn't initiate login: " + error + ": " + xhr.responseText).show();
                 }
             });
         });
