@@ -1,8 +1,13 @@
 <?php
 
-include APPPATH . 'third_party/WebAuthn.php';
+use PragmaRX\Google2FA\Google2FA;
 
-class Api extends CI_Controller {
+class ApiTfa extends CI_Controller {
+    private $name = 'TFAExample';
+    private $email = 'tfaexample@example.com';
+    private $secretKey;
+    private $keySize = 25;
+    private $keyPrefix = '';
 
     public function __construct()
     {
@@ -31,14 +36,13 @@ class Api extends CI_Controller {
 
     // Initiate registration
     public function register_username() {
-        session_start();
-        $webauthn = new WebAuthn($_SERVER['HTTP_HOST']);
-
         if (!$this->input->get('name') || !$this->input->get('password')) {
             set_status_header(400);
             echo 'Name or password missing';
             return false;
         }
+
+        $googleTfa = new Google2FA();
 
         $name = $this->input->get('name');
         $password = $this->input->get('password');
@@ -49,44 +53,45 @@ class Api extends CI_Controller {
         $useTfa         = $this->input->get('use_tfa');
         $useSns         = $this->input->get('use_sns');
         $usePhysicalKey = $this->input->get('use_physical_key');
-        $randId         = time() . '-' . rand(1,1000000000);
+        $randId         = $googleTfa->generateSecretKey();
 
         // Create the user
         $this->user_model->set_user($name, $email, $password, $useTfa, $useSns, $usePhysicalKey, $randId, null);
         $user = $this->user_model->get_user($email, $password);
 
-        $_SESSION['name'] = $name;
-
-        $crossPlatform = (!empty($this->input->get('crossplatform')) && $this->input->get('crossplatform'));
-        $challenge = $webauthn->prepareChallengeForRegistration($user['name'], $user['id'], $crossPlatform);
+        $googleUrl = ''; //$googleTfa->getQRCodeGoogleUrl($this->name, $this->email, $key);
+        $inlineUrl = ''; //$googleTfa->getQRCodeInline($this->name, $this->email, $key);
 
         header('Content-type: application/json');
-        echo json_encode(['challenge' => $challenge]);
+        echo json_encode(['secret' => $randId, 'googleUrl' => $googleUrl, 'inlineUrl' => $inlineUrl]);
         exit;
     }
 
     // Complete registration
     public function register() {
-        $webauthn = new WebAuthn($_SERVER['HTTP_HOST']);
-
-        if (!$this->input->get('name') || !$this->input->get('email') || !$this->input->get('password')) {
+        if (!$this->input->get('name') || !$this->input->get('email')  || !$this->input->get('password') || !$this->input->get('tfa_code')) {
             set_status_header(400);
-            echo 'Name or password missing';
+            echo 'Name, email, password, or code missing';
             return false;
         }
-        $name        = $this->input->get('name');
-        $email       = $this->input->get('email');
-        $password    = $this->input->get('password');
-        $physicalKey = $webauthn->register($this->input->get('register'), '');
+
+        $googleTfa = new Google2FA();
+
+        $email    = $this->input->get('email');
+        $password = $this->input->get('password');
+        $code     = $this->input->get('tfa_code');
 
         $user = $this->user_model->get_user($email, $password);
 
-        // Save the result to enable a challenge to be raised against this newly created key in order to log in
-        $this->user_model->update_physical_key($user['id'], $physicalKey);
-
-        header('Content-type: application/json');
-        echo json_encode('ok');
-        exit;
+        if (!$googleTfa->verifyKey($user['rand_id'], $code)) {
+            set_status_header(400);
+            echo 'Invalid code';
+            return false;
+        } else {
+            header('Content-type: application/json');
+            echo json_encode('ok');
+            exit;
+        }
     }
 
     public function login_username() {
@@ -158,4 +163,20 @@ class Api extends CI_Controller {
         echo json_encode('ok');
         exit;
     }
+
+    /**
+     * Generates a random alphanumeric key.
+     *
+     * @param int $length
+     *
+     * @return string
+     */
+    private function generateKey($length = 25) {
+        $pool = array_merge(range(0,9), range('a', 'z'),range('A', 'Z'));
+        for($i = 0; $i < $length; $i++) {
+            $key .= $pool[mt_rand(0, count($pool) - 1)];
+        }
+        return $key;
+    }
+
 }

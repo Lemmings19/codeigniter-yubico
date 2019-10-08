@@ -7,7 +7,7 @@
                     Welcome, <?php echo $name; ?>.
                 </p>
             <?php else: ?>
-                <small class="text-muted">(not really)</small>
+                <small class="text-muted">(not directed here via php login)</small>
             <?php endif; ?>
         </div>
     </div>
